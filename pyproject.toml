@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PaddleScienceKits"
+version = "0.1.0"
+description = "A machine learning kits based on PaddlePaddle, re-implementing classical models as paddle.nn.Layer."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.8"
+authors = [{ name = "Liyulingyue" }]
+dependencies = ["paddlepaddle>=2.4"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+
+[tool.setuptools.packages.find]
+exclude = ["tests*", "examples*"]
