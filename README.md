@@ -15,7 +15,7 @@ neural networks.
 | Submodule | Status | Contents |
 | --- | --- | --- |
 | `PaddleScienceKits.TimeSeries` | ✅ | `AR`, `ARMA`, `FIR`, 通用 `Autoregressive` |
-| `PaddleScienceKits.ClassicalML` | ✅ | `KMeans`, `KNN`, `PCA`, `KernelRidge`, `GMM` |
+| `PaddleScienceKits.ClassicalML` | ✅ | `KMeans`, `KNN`, `PCA`, `KernelRidge`, `GMM`, `LDA`, `GaussianNB`, `MultinomialNB`, `ICA`, `SoftDecisionTree` |
 
 ## 安装
 
@@ -94,6 +94,32 @@ gmm.fit_em(paddle.randn([300, 2]), n_iter=20)
 resp = gmm(paddle.randn([8, 2]))                # [8, 3]   软责任
 ```
 
+### ClassicalML —— LDA / NaiveBayes / ICA / SoftDecisionTree
+
+```python
+import paddle
+from PaddleScienceKits.ClassicalML import (
+    LDA, GaussianNB, MultinomialNB, ICA, SoftDecisionTree,
+)
+
+# LDA: 闭式特征分解；既能投影也能输出高斯判别 log p(y|x)
+lda = LDA(n_components=2, dim=2, n_classes=3).fit(X, Y)
+logits = lda(X)                    # [N, 3]   可微的高斯判别 log-prob
+
+# GaussianNB / MultinomialNB: 闭式 MLE，可作分类头
+gnb = GaussianNB(dim=2, n_classes=2).fit(X, Y)
+mnb = MultinomialNB(n_features=6, n_classes=2, alpha=1.0).fit(counts, Y)
+
+# ICA: PCA 白化 + 对称 FastICA 定点迭代
+ica = ICA(n_components=2, dim=2, nonlinearity="cube").fit(X)
+sources = ica.transform(X)          # [N, 2]
+recon   = ica.inverse_transform(sources)
+
+# SoftDecisionTree: 可微决策树（Frosst 2017）
+tree = SoftDecisionTree(depth=4, n_features=2, n_classes=2, temperature=1.5)
+# then optimise with Adam like any paddle layer
+```
+
 ## 设计理念
 
 * **可微**：`KMeans` 在训练模式下输出软分配（带 temperature 的 softmax），
@@ -110,6 +136,7 @@ resp = gmm(paddle.randn([8, 2]))                # [8, 3]   软责任
 * `examples/timeseries_ar.py` —— AR(2) 端到端回归
 * `examples/classicalml_kmeans_classifier.py` —— KMeans 软特征 + 线性分类器联合训练
 * `examples/classicalml_gmm_classifier.py` —— GMM 软责任 + 线性分类器联合训练
+* `examples/classicalml_soft_tree_moons.py` —— 软决策树在 moons 数据集上训练
 
 ## 旧项目说明
 
