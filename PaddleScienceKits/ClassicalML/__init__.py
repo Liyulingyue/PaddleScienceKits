@@ -1,6 +1,15 @@
-"""ClassicalML submodule placeholder.
+"""ClassicalML submodule: classical ML models re-implemented as
+``paddle.nn.Layer`` so they can be composed with deep networks.
 
-Will host Paddle-implemented versions of KMeans, KNN, PCA, decision
-trees, etc. The point of the kit is to expose these classical models
-as ``paddle.nn.Layer`` so they can participate in autograd pipelines.
+Currently hosts:
+
+* :class:`KMeans`  — centroids as learnable parameters; soft or hard
+  assignment; standard Lloyd updates during ``train()`` mode.
+* :class:`KNN`     — non-parametric memory layer; top-k retrieval and
+  average-pool reconstruction.
 """
+
+from .KMeans import KMeans
+from .KNN import KNN
+
+__all__ = ["KMeans", "KNN"]
