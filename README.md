@@ -15,7 +15,7 @@ neural networks.
 | Submodule | Status | Contents |
 | --- | --- | --- |
 | `PaddleScienceKits.TimeSeries` | ✅ | `AR`, `ARMA`, `FIR`, 通用 `Autoregressive` |
-| `PaddleScienceKits.ClassicalML` | ✅ | `KMeans`（质心可学，可微软分配）、`KNN`（记忆层） |
+| `PaddleScienceKits.ClassicalML` | ✅ | `KMeans`, `KNN`, `PCA`, `KernelRidge`, `GMM` |
 
 ## 安装
 
@@ -69,6 +69,31 @@ idx = nn(paddle.randn([5, 4]), mode="indices")  # [5, 3]
 avg = nn(paddle.randn([5, 4]), mode="average")  # [5, 4]   邻居均值
 ```
 
+### ClassicalML —— PCA / KernelRidge / GMM
+
+```python
+import paddle
+from PaddleScienceKits.ClassicalML import PCA, KernelRidge, GMM
+
+# PCA: 正交基是 nn.Parameter，每步 QR 重新正交化
+pca = PCA(n_components=2, dim=5)
+pca.fit(paddle.randn([200, 5]))
+coords = pca.project(paddle.randn([8, 5]))     # [8, 2]
+rec    = pca.reconstruct(coords)               # [8, 5]
+
+# KernelRidge: 对偶形式 + 闭式解
+kr = KernelRidge(n_support=200, dim_in=1, dim_out=1,
+                 kernel="rbf", gamma=0.5, alpha=1e-2)
+kr.fit(paddle.linspace(-3, 3, 200).unsqueeze(-1),
+       paddle.sin(paddle.linspace(-3, 3, 200).unsqueeze(-1)))
+pred = kr(paddle.linspace(-3, 3, 5).unsqueeze(-1))   # [5, 1]
+
+# GMM: 软责任可微，EM 闭式更新
+gmm = GMM(k=3, dim=2, covariance_type="diag")
+gmm.fit_em(paddle.randn([300, 2]), n_iter=20)
+resp = gmm(paddle.randn([8, 2]))                # [8, 3]   软责任
+```
+
 ## 设计理念
 
 * **可微**：`KMeans` 在训练模式下输出软分配（带 temperature 的 softmax），
@@ -84,6 +109,7 @@ avg = nn(paddle.randn([5, 4]), mode="average")  # [5, 4]   邻居均值
 
 * `examples/timeseries_ar.py` —— AR(2) 端到端回归
 * `examples/classicalml_kmeans_classifier.py` —— KMeans 软特征 + 线性分类器联合训练
+* `examples/classicalml_gmm_classifier.py` —— GMM 软责任 + 线性分类器联合训练
 
 ## 旧项目说明
 
