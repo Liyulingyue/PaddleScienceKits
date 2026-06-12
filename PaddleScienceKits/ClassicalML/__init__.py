@@ -24,6 +24,10 @@ Currently hosts:
   with whitening.
 * :class:`SoftDecisionTree`  — Frosst 2017 differentiable decision
   tree with sigmoid inner nodes and per-leaf class distributions.
+* :class:`BayesianRidge`     — Bayesian linear regression with
+  marginal-likelihood maximisation; full predictive distribution.
+* :class:`SVM`               — LS-SVM with kernelised RBF / linear /
+  polynomial kernels and one-vs-rest multi-class extension.
 """
 
 from .KMeans import KMeans
@@ -35,8 +39,11 @@ from .LDA import LDA
 from .NaiveBayes import GaussianNB, MultinomialNB
 from .ICA import ICA
 from .SoftDecisionTree import SoftDecisionTree
+from .BayesianRidge import BayesianRidge
+from .SVM import SVM
 
 __all__ = [
     "KMeans", "KNN", "PCA", "KernelRidge", "GMM",
     "LDA", "GaussianNB", "MultinomialNB", "ICA", "SoftDecisionTree",
+    "BayesianRidge", "SVM",
 ]

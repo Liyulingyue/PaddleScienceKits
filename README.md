@@ -15,7 +15,8 @@ neural networks.
 | Submodule | Status | Contents |
 | --- | --- | --- |
 | `PaddleScienceKits.TimeSeries` | ✅ | `AR`, `ARMA`, `FIR`, 通用 `Autoregressive` |
-| `PaddleScienceKits.ClassicalML` | ✅ | `KMeans`, `KNN`, `PCA`, `KernelRidge`, `GMM`, `LDA`, `GaussianNB`, `MultinomialNB`, `ICA`, `SoftDecisionTree` |
+| `PaddleScienceKits.ClassicalML` | ✅ | `KMeans`, `KNN`, `PCA`, `KernelRidge`, `GMM`, `LDA`, `GaussianNB`, `MultinomialNB`, `ICA`, `SoftDecisionTree`, `BayesianRidge`, `SVM` |
+| `PaddleScienceKits.SignalProcessing` | ✅ | `STFT`/`ISTFT` (可学窗), `MelSpectrogram`, `WaveletFilterBank` |
 
 ## 安装
 
@@ -120,6 +121,45 @@ tree = SoftDecisionTree(depth=4, n_features=2, n_classes=2, temperature=1.5)
 # then optimise with Adam like any paddle layer
 ```
 
+### ClassicalML —— BayesianRidge / SVM (LS-SVM)
+
+```python
+import paddle
+from PaddleScienceKits.ClassicalML import BayesianRidge, SVM
+
+# Bayesian Ridge: EM 更新 alpha（噪声精度）+ lambda（权重精度），
+# 返回 predictive mean + 可选 std。
+br = BayesianRidge(n_features=3, n_outputs=1).fit(X, y)
+mean, std = br.forward_with_std(X)      # [N, 1], [N, 1]
+
+# LS-SVM: 对偶形式 + 闭式线性系统解；RBF / linear / polynomial kernel。
+# 二分类用单个对偶，多分类用 OvR。
+svm = SVM(n_support=80, dim=2, n_classes=2, kernel="rbf", gamma=0.3, C=10.0).fit(X, Y)
+acc = (svm.predict(X) == Y).astype("float32").mean()
+```
+
+### SignalProcessing —— STFT / MelSpec / Wavelet
+
+```python
+import paddle
+from PaddleScienceKits.SignalProcessing import STFT, ISTFT, MelSpectrogram, WaveletFilterBank
+
+# STFT / iSTFT：分析窗默认 Hann，可学习。
+stft = STFT(win_length=400, hop_length=160, n_fft=512)
+istft = ISTFT(win_length=400, hop_length=160, n_fft=512, center=True)
+spec = stft(x)                                  # [B, F, T]   complex
+x_rec = istft(spec)
+
+# Log-Mel spectrogram
+mel = MelSpectrogram(n_mels=40, sample_rate=16000,
+                     win_length=400, hop_length=160, n_fft=512)
+features = mel(x)                               # [B, 40, T]
+
+# Wavelet filter bank: 多尺度分解；Haar (filter_length=2) 或可学。
+wfb = WaveletFilterBank(n_scales=3, filter_length=2, learnable=True)
+details = wfb(x)                                # list of 3 tensors
+```
+
 ## 设计理念
 
 * **可微**：`KMeans` 在训练模式下输出软分配（带 temperature 的 softmax），
@@ -137,6 +177,7 @@ tree = SoftDecisionTree(depth=4, n_features=2, n_classes=2, temperature=1.5)
 * `examples/classicalml_kmeans_classifier.py` —— KMeans 软特征 + 线性分类器联合训练
 * `examples/classicalml_gmm_classifier.py` —— GMM 软责任 + 线性分类器联合训练
 * `examples/classicalml_soft_tree_moons.py` —— 软决策树在 moons 数据集上训练
+* `examples/signalproc_mel_classifier.py` —— log-Mel + 线性头区分纯音频率
 
 ## 旧项目说明
 
