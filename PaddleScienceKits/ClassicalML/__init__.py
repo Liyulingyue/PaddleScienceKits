@@ -33,6 +33,12 @@ Currently hosts:
   hyperparameters.
 * :class:`GaussianHMM`       — categorical-emission hidden Markov
   model with closed-form EM (Baum-Welch).
+* :class:`KalmanFilter`      — Linear Dynamical System with
+  Kalman filtering / RTS smoothing and closed-form EM.
+* :class:`LinearChainCRF`    — linear-chain CRF with
+  forward-backward training and Viterbi decode.
+* :class:`tSNE`              — Student-t SNE embedding with
+  early-exaggeration and Adam-based KL minimisation.
 """
 
 from .KMeans import KMeans
@@ -48,9 +54,13 @@ from .BayesianRidge import BayesianRidge
 from .SVM import SVM
 from .GaussianProcess import GaussianProcess
 from .GaussianHMM import GaussianHMM
+from .KalmanFilter import KalmanFilter
+from .LinearChainCRF import LinearChainCRF
+from .tSNE import tSNE
 
 __all__ = [
     "KMeans", "KNN", "PCA", "KernelRidge", "GMM",
     "LDA", "GaussianNB", "MultinomialNB", "ICA", "SoftDecisionTree",
     "BayesianRidge", "SVM", "GaussianProcess", "GaussianHMM",
+    "KalmanFilter", "LinearChainCRF", "tSNE",
 ]
