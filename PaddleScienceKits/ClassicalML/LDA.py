@@ -19,7 +19,10 @@ from .utils import _to_2d
 
 
 class LDA(paddle.nn.Layer):
-    """Multi-class Fisher LDA.
+    """
+    Analogue:
+        sklearn.discriminant_analysis.LinearDiscriminantAnalysis (Fisher 1936)
+    Multi-class Fisher LDA.
 
     Parameters
     ----------

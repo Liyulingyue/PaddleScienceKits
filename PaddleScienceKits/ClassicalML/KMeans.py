@@ -20,7 +20,10 @@ from .utils import _to_2d
 
 
 class KMeans(paddle.nn.Layer):
-    """K-means quantizer with learnable centroids.
+    """
+    Analogue:
+        sklearn.cluster.KMeans (Lloyd 1982)
+    K-means quantizer with learnable centroids.
 
     Parameters
     ----------

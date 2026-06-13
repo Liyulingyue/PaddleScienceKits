@@ -28,7 +28,10 @@ def _orthonormalise(matrix: paddle.Tensor) -> paddle.Tensor:
 
 
 class PCA(paddle.nn.Layer):
-    """PCA bottleneck layer with a learnable orthogonal basis.
+    """
+    Analogue:
+        sklearn.decomposition.PCA (Pearson 1901; Hotelling 1933)
+    PCA bottleneck layer with a learnable orthogonal basis.
 
     Parameters
     ----------

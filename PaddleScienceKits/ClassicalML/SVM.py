@@ -111,7 +111,10 @@ class _BinaryLSSVM(paddle.nn.Layer):
 
 
 class SVM(paddle.nn.Layer):
-    """Kernelised LS-SVM with one-vs-rest multi-class extension.
+    """
+    Analogue:
+        sklearn.svm.SVC, LS-SVM (Suykens & Vandewalle 1999) for the closed-form variant
+    Kernelised LS-SVM with one-vs-rest multi-class extension.
 
     Parameters
     ----------

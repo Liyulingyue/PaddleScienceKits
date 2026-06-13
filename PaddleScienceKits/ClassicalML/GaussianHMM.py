@@ -43,7 +43,10 @@ def _logsumexp(x: paddle.Tensor, axis: int = -1, keepdim: bool = False) -> paddl
 
 
 class GaussianHMM(paddle.nn.Layer):
-    """Categorical-emission HMM with closed-form EM.
+    """
+    Analogue:
+        hmmlearn.hmm.GaussianHMM (Baum & Welch 1970 EM)
+    Categorical-emission HMM with closed-form EM.
 
     Parameters
     ----------

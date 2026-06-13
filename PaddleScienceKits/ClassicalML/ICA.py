@@ -30,7 +30,10 @@ def _sym_decorrelate(W: paddle.Tensor) -> paddle.Tensor:
 
 
 class ICA(paddle.nn.Layer):
-    """FastICA source separation layer (symmetric / parallel).
+    """
+    Analogue:
+        sklearn.decomposition.FastICA (Hyvärinen 1999)
+    FastICA source separation layer (symmetric / parallel).
 
     Parameters
     ----------

@@ -35,7 +35,10 @@ def _gauss_kl(
 
 
 class BayesianLinearVI(paddle.nn.Layer):
-    """Bayesian linear regression with mean-field VI.
+    """
+    Analogue:
+        Blei et al. 2017 'Variational Inference: A Review for Statisticians'; sklearn-style BayesianRidge but with explicit mean-field VI
+    Bayesian linear regression with mean-field VI.
 
     Parameters
     ----------

@@ -18,7 +18,10 @@ from .utils import _to_2d
 
 
 class BayesianRidge(paddle.nn.Layer):
-    """Bayesian linear regression with marginal-likelihood maximisation.
+    """
+    Analogue:
+        sklearn.linear_model.BayesianRidge / Tipping 2001
+    Bayesian linear regression with marginal-likelihood maximisation.
 
     Parameters
     ----------

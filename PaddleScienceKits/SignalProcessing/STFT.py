@@ -32,7 +32,10 @@ def _pad_centred(x: paddle.Tensor, pad: int, n_fft: int) -> paddle.Tensor:
 
 
 class STFT(paddle.nn.Layer):
-    """Forward STFT.
+    """
+    Analogue:
+        librosa STFT; Oppenheim & Schafer 'Discrete-Time Signal Processing'
+    Forward STFT.
 
     Parameters
     ----------
@@ -116,7 +119,10 @@ class STFT(paddle.nn.Layer):
 
 
 class ISTFT(paddle.nn.Layer):
-    """Inverse STFT using overlap-add.
+    """
+    Analogue:
+        librosa.istft; Griffin-Lim algorithm context
+    Inverse STFT using overlap-add.
 
     Mirrors :class:`STFT` defaults: same ``win_length``, ``hop_length``,
     ``n_fft``, and ``center`` setting.

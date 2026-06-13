@@ -16,7 +16,10 @@ from .utils import _to_2d
 
 
 class NMF(paddle.nn.Layer):
-    """Non-negative matrix factorisation.
+    """
+    Analogue:
+        sklearn.decomposition.NMF (Lee & Seung 2001 'Algorithms for Non-negative Matrix Factorization')
+    Non-negative matrix factorisation.
 
     Parameters
     ----------

@@ -26,7 +26,10 @@ def _sym(matrix: paddle.Tensor) -> paddle.Tensor:
 
 
 class KalmanFilter(paddle.nn.Layer):
-    """Linear Gaussian state-space model with closed-form filtering
+    """
+    Analogue:
+        filterpy.kalman.KalmanFilter / Kalman 1960; Rauch-Tung-Striebel 1965 smoother
+    Linear Gaussian state-space model with closed-form filtering
     and smoothing.
 
     Parameters

@@ -37,7 +37,10 @@ class _BaseNB(paddle.nn.Layer):
 
 # --------------------------------------------------------------- Gaussian
 class GaussianNB(_BaseNB):
-    """Per-class Gaussian Naive Bayes.
+    """
+    Analogue:
+        sklearn.naive_bayes.GaussianNB
+    Per-class Gaussian Naive Bayes.
 
     Parameters
     ----------
@@ -116,7 +119,10 @@ class GaussianNB(_BaseNB):
 
 # ------------------------------------------------------------- Multinomial
 class MultinomialNB(_BaseNB):
-    """Multinomial Naive Bayes for non-negative count features.
+    """
+    Analogue:
+        sklearn.naive_bayes.MultinomialNB
+    Multinomial Naive Bayes for non-negative count features.
 
     Parameters
     ----------

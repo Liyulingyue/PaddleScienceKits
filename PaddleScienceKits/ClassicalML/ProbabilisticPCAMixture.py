@@ -45,7 +45,10 @@ def _ppca_log_lik(
 
 
 class ProbabilisticPCAMixture(paddle.nn.Layer):
-    """Mixture of probabilistic PCA models.
+    """
+    Analogue:
+        Tipping & Bishop 1999 'Mixtures of Probabilistic Principal Component Analysers'
+    Mixture of probabilistic PCA models.
 
     Parameters
     ----------

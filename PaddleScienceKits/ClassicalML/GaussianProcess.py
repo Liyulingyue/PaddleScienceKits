@@ -58,7 +58,10 @@ def _matern_52(x: paddle.Tensor, y: paddle.Tensor, gamma: float) -> paddle.Tenso
 
 
 class GaussianProcess(paddle.nn.Layer):
-    """Gaussian Process regression.
+    """
+    Analogue:
+        sklearn.gaussian_process.GaussianProcessRegressor (Rasmussen & Williams 2006)
+    Gaussian Process regression.
 
     Parameters
     ----------

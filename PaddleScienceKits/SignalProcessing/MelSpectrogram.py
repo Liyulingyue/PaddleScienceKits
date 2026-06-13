@@ -54,7 +54,10 @@ def _mel_filterbank(
 
 
 class MelSpectrogram(paddle.nn.Layer):
-    """Log-Mel spectrogram.
+    """
+    Analogue:
+        librosa.feature.melspectrogram
+    Log-Mel spectrogram.
 
     Parameters
     ----------

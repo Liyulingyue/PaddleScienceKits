@@ -20,7 +20,10 @@ from .utils import _to_2d
 
 
 class KNN(paddle.nn.Layer):
-    """Top-k nearest-neighbour memory layer.
+    """
+    Analogue:
+        sklearn.neighbors.KNeighborsClassifier / Cover & Hart 1967
+    Top-k nearest-neighbour memory layer.
 
     Parameters
     ----------

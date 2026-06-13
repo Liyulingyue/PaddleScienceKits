@@ -27,7 +27,10 @@ def _logsumexp(x: paddle.Tensor, axis: int = -1, keepdim: bool = False) -> paddl
 
 
 class GMMHMM(paddle.nn.Layer):
-    """GMM-emission HMM.
+    """
+    Analogue:
+        hmmlearn.hmm.GMMHMM (Rabiner 1989)
+    GMM-emission HMM.
 
     Parameters
     ----------

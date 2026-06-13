@@ -74,7 +74,10 @@ def _student_t_q(sq_dists_y: paddle.Tensor) -> paddle.Tensor:
 
 
 class tSNE(paddle.nn.Layer):
-    """Student-t SNE.
+    """
+    Analogue:
+        sklearn.manifold.TSNE (van der Maaten & Hinton 2008)
+    Student-t SNE.
 
     Parameters
     ----------

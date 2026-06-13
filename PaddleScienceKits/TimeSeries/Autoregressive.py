@@ -28,7 +28,10 @@ from .utils import _check_shapes, _to_2d
 
 
 class Autoregressive(paddle.nn.Layer):
-    """A single shared linear layer mixes all lagged inputs and a bias.
+    """
+    Analogue:
+        AR / ARMA / ARMAX in statsmodels.tsa.arima.model / Hamilton (1994) Time Series Analysis
+    A single shared linear layer mixes all lagged inputs and a bias.
 
     Compared with the original ``PaddleAutoregressive.Autoregressive``,
     this implementation:

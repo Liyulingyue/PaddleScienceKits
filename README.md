@@ -1,8 +1,8 @@
 # PaddleScienceKits
 
-一个基于飞桨的**科学/机器学习工具包**。
+一个基于飞桨的**经典统计学习 / 科学计算工具包**。
 
-> 核心定位：把传统机器学习、信号处理、统计建模方法，**重写为 `paddle.nn.Layer`**，
+> 核心定位：把传统机器学习、信号处理、概率推断方法，**重写为 `paddle.nn.Layer`**，
 > 从而可以像普通深度学习算子一样参与组网、梯度反传、GPU 加速。
 
 This is **not** just a deep-learning toolkit. The whole point of
@@ -10,13 +10,57 @@ This is **not** just a deep-learning toolkit. The whole point of
 and structure can be expressed with `paddle.nn.Layer` so it composes with
 neural networks.
 
-## 子模块
+我们收录的方法都满足两条线：
 
-| Submodule | Status | Contents |
-| --- | --- | --- |
-| `PaddleScienceKits.TimeSeries` | ✅ | `AR`, `ARMA`, `FIR`, 通用 `Autoregressive` |
-| `PaddleScienceKits.ClassicalML` | ✅ | `KMeans`, `KNN`, `PCA`, `KernelRidge`, `GMM`, `LDA`, `GaussianNB`, `MultinomialNB`, `ICA`, `SoftDecisionTree`, `BayesianRidge`, `SVM`, `GaussianProcess`, `GaussianHMM`, `KalmanFilter`, `LinearChainCRF`, `tSNE`, `SparseCoding`, `BayesianLinearVI`, `tICA`, `NMF`, `GMMHMM`, `ProbabilisticPCAMixture` |
-| `PaddleScienceKits.SignalProcessing` | ✅ | `STFT`/`ISTFT` (可学窗), `MelSpectrogram`, `WaveletFilterBank` |
+1. **不与 Paddle 内置功能重复**（CNN / RNN / Transformer / 各类优化器 / 损失函数 / 数据加载等都不在范围）。
+2. **不是纯深度学习 pipeline**（图像分类、目标检测、分割等 end-to-end 模板不属于本工具包）。
+
+具体收/不收规则见 [`CONTRIBUTING.md`](./CONTRIBUTING.md)。
+
+## 子模块（按 8 大类组织）
+
+### 1. 时序与状态空间模型
+| Submodule | Contents |
+| --- | --- |
+| `TimeSeries` | `AR`, `ARMA`, `FIR`, `Autoregressive` |
+| `ClassicalML` | `KalmanFilter`, `GaussianHMM`, `GMMHMM`, `tICA` |
+
+### 2. 降维与流形学习
+| Submodule | Contents |
+| --- | --- |
+| `ClassicalML` | `PCA`, `ICA`, `NMF`, `tSNE`, `ProbabilisticPCAMixture` |
+
+### 3. 概率 / 生成模型
+| Submodule | Contents |
+| --- | --- |
+| `ClassicalML` | `GMM`, `BayesianRidge`, `BayesianLinearVI`, `GaussianProcess`, `LinearChainCRF` |
+
+### 4. 核方法
+| Submodule | Contents |
+| --- | --- |
+| `ClassicalML` | `KernelRidge`, `SVM` |
+
+### 5. 监督学习（分类 / 回归）
+| Submodule | Contents |
+| --- | --- |
+| `ClassicalML` | `LDA`, `GaussianNB`, `MultinomialNB`, `SoftDecisionTree` |
+
+### 6. 聚类
+| Submodule | Contents |
+| --- | --- |
+| `ClassicalML` | `KMeans`, `KNN` |
+
+### 7. 稀疏表示
+| Submodule | Contents |
+| --- | --- |
+| `ClassicalML` | `SparseCoding` |
+
+### 8. 信号处理
+| Submodule | Contents |
+| --- | --- |
+| `SignalProcessing` | `STFT`/`ISTFT` (可学窗), `MelSpectrogram`, `WaveletFilterBank` |
+
+每个组件的类 docstring 顶部都注明"对标方法"（sklearn / statsmodels / 经典文献），方便查证。
 
 ## 安装
 
@@ -30,7 +74,7 @@ pip install -e .
 
 ## 快速上手
 
-### TimeSeries —— AR / ARMA / FIR
+### 1. 时序与状态空间模型
 
 ```python
 import paddle
@@ -42,109 +86,167 @@ y = paddle.randn([8, 3])
 u1, u2, v = paddle.randn([8, 2]), paddle.randn([8, 4]), paddle.randn([8, 2])
 out = model(y, u1, u2, v)                      # [8, 1]
 
-# AR(p)
 ar = AR(p=5)
 y_seq = paddle.randn([8, 5])
 print(ar(y_seq).shape)                         # [8, 1]
 ```
 
-### ClassicalML —— KMeans / KNN
-
 ```python
-import paddle
-from PaddleScienceKits.ClassicalML import KMeans, KNN
+# Kalman filter / smoother
+from PaddleScienceKits.ClassicalML import KalmanFilter
+kf = KalmanFilter(state_dim=2, obs_dim=2)
+x_smooth = kf(y_seq)                           # [T, state_dim]   smoother 输出
 
-# KMeans: 质心是 nn.Parameter，软分配路径可微
-km = KMeans(k=4, dim=3, temperature=0.5)
-km.fit_kmeanspp(paddle.randn([200, 3]))         # k-means++ 种子
-km.fit(paddle.randn([200, 3]), n_iter=10)        # Lloyd
-soft = km(paddle.randn([8, 3]))                 # [8, 4]   软分配
-hard = km(paddle.randn([8, 3]), hard=True)      # [8]      整数标签
+# HMM / GMM-HMM
+from PaddleScienceKits.ClassicalML import GaussianHMM, GMMHMM
+hmm = GaussianHMM(n_states=3, n_emissions=10)
+hmm.fit_em(seq, n_iter=80)
+gamma = hmm(seq)                               # [T, n_states]
+path  = hmm.viterbi(seq)                       # [T] int64
 
-# KNN: 记忆层
-nn = KNN(k=3, dim=4)
-nn.update_memory(paddle.randn([50, 4]))         # 注册样本
-nn.update_memory(paddle.randn([50, 4]),
-                 values=paddle.randn([50, 4]))  # 可选 value_bank
-idx = nn(paddle.randn([5, 4]), mode="indices")  # [5, 3]
-avg = nn(paddle.randn([5, 4]), mode="average")  # [5, 4]   邻居均值
+ghmm = GMMHMM(n_states=3, n_components=2, n_features=4)
+ghmm.fit_em(x_seq, n_iter=50)                  # 连续观测
+gamma = ghmm(x_seq)
+path  = ghmm.viterbi(x_seq)
+
+# tICA 慢模
+from PaddleScienceKits.ClassicalML import tICA
+tica = tICA(n_components=3, dim=D, lag=20).fit(X)
+slow = tica.transform(X)                        # [T, n_components]
 ```
 
-### ClassicalML —— PCA / KernelRidge / GMM
+### 2. 降维与流形学习
 
 ```python
-import paddle
-from PaddleScienceKits.ClassicalML import PCA, KernelRidge, GMM
+from PaddleScienceKits.ClassicalML import PCA, ICA, NMF, tSNE, ProbabilisticPCAMixture
 
 # PCA: 正交基是 nn.Parameter，每步 QR 重新正交化
-pca = PCA(n_components=2, dim=5)
-pca.fit(paddle.randn([200, 5]))
-coords = pca.project(paddle.randn([8, 5]))     # [8, 2]
-rec    = pca.reconstruct(coords)               # [8, 5]
+pca = PCA(n_components=2, dim=5).fit(X)
+coords = pca.project(X)                        # [N, 2]
+rec    = pca.reconstruct(coords)               # [N, 5]
+
+# ICA: PCA 白化 + 对称 FastICA 定点迭代
+ica = ICA(n_components=2, dim=2, nonlinearity="cube").fit(X)
+sources = ica.transform(X)
+recon   = ica.inverse_transform(sources)
+
+# NMF: Lee-Seung 乘法更新；非负字典 W + 非负激活 H
+nmf = NMF(n_components=10, n_features=D, init="nndsvd")
+nmf.fit(X, n_iter=200)
+H_new = nmf.transform(X)
+rec   = nmf.reconstruct(H_new)
+
+# t-SNE: Adam-based KL minimisation with early exaggeration
+tsne = tSNE(n_components=2, perplexity=30.0, n_iter=500)
+Y = tsne.fit_transform(X)                       # [N, 2]
+
+# Mixture of PPCA
+ppca = ProbabilisticPCAMixture(n_components=K, n_features=D, n_latent=L)
+ppca.fit_em(X, n_iter=30)
+gamma = ppca(X)                                # [N, K]
+```
+
+### 3. 概率 / 生成模型
+
+```python
+from PaddleScienceKits.ClassicalML import GMM, BayesianRidge, BayesianLinearVI, GaussianProcess, LinearChainCRF
+
+# GMM: 软责任可微，EM 闭式更新
+gmm = GMM(k=3, dim=2, covariance_type="diag").fit_em(X, n_iter=20)
+resp = gmm(X_test)                             # [N, 3]
+
+# Bayesian Ridge: EM 更新 alpha + lambda，返回 predictive mean + std
+br = BayesianRidge(n_features=3, n_outputs=1).fit(X, y)
+mean, std = br.forward_with_std(X_test)
+
+# Bayesian linear regression with mean-field VI
+blr = BayesianLinearVI(n_features=3, n_outputs=1, prior_std=1.0, noise_std=0.1)
+loss = blr.neg_elbo(x, y, n_samples=1)         # -ELBO
+mean, std = blr.predict(x_test, n_samples=80)
+
+# GP regression: RBF / Matérn / linear / poly
+gp = GaussianProcess(dim=1, n_train=N, kernel="rbf").fit(X, y)
+mean, std = gp.forward_with_std(X_test)
+loss = gp.neg_log_marginal_likelihood()
+
+# Linear-chain CRF
+crf = LinearChainCRF(n_features=5, n_tags=3)
+loss = crf.nll(features, tags)
+gamma = crf(features)
+path  = crf.decode(features)
+```
+
+### 4. 核方法
+
+```python
+from PaddleScienceKits.ClassicalML import KernelRidge, SVM
 
 # KernelRidge: 对偶形式 + 闭式解
 kr = KernelRidge(n_support=200, dim_in=1, dim_out=1,
                  kernel="rbf", gamma=0.5, alpha=1e-2)
-kr.fit(paddle.linspace(-3, 3, 200).unsqueeze(-1),
-       paddle.sin(paddle.linspace(-3, 3, 200).unsqueeze(-1)))
-pred = kr(paddle.linspace(-3, 3, 5).unsqueeze(-1))   # [5, 1]
+kr.fit(x_train, y_train)
+pred = kr(x_test)
 
-# GMM: 软责任可微，EM 闭式更新
-gmm = GMM(k=3, dim=2, covariance_type="diag")
-gmm.fit_em(paddle.randn([300, 2]), n_iter=20)
-resp = gmm(paddle.randn([8, 2]))                # [8, 3]   软责任
-```
-
-### ClassicalML —— LDA / NaiveBayes / ICA / SoftDecisionTree
-
-```python
-import paddle
-from PaddleScienceKits.ClassicalML import (
-    LDA, GaussianNB, MultinomialNB, ICA, SoftDecisionTree,
-)
-
-# LDA: 闭式特征分解；既能投影也能输出高斯判别 log p(y|x)
-lda = LDA(n_components=2, dim=2, n_classes=3).fit(X, Y)
-logits = lda(X)                    # [N, 3]   可微的高斯判别 log-prob
-
-# GaussianNB / MultinomialNB: 闭式 MLE，可作分类头
-gnb = GaussianNB(dim=2, n_classes=2).fit(X, Y)
-mnb = MultinomialNB(n_features=6, n_classes=2, alpha=1.0).fit(counts, Y)
-
-# ICA: PCA 白化 + 对称 FastICA 定点迭代
-ica = ICA(n_components=2, dim=2, nonlinearity="cube").fit(X)
-sources = ica.transform(X)          # [N, 2]
-recon   = ica.inverse_transform(sources)
-
-# SoftDecisionTree: 可微决策树（Frosst 2017）
-tree = SoftDecisionTree(depth=4, n_features=2, n_classes=2, temperature=1.5)
-# then optimise with Adam like any paddle layer
-```
-
-### ClassicalML —— BayesianRidge / SVM (LS-SVM)
-
-```python
-import paddle
-from PaddleScienceKits.ClassicalML import BayesianRidge, SVM
-
-# Bayesian Ridge: EM 更新 alpha（噪声精度）+ lambda（权重精度），
-# 返回 predictive mean + 可选 std。
-br = BayesianRidge(n_features=3, n_outputs=1).fit(X, y)
-mean, std = br.forward_with_std(X)      # [N, 1], [N, 1]
-
-# LS-SVM: 对偶形式 + 闭式线性系统解；RBF / linear / polynomial kernel。
-# 二分类用单个对偶，多分类用 OvR。
+# LS-SVM: 对偶闭式线性系统；RBF / linear / poly；OvR 多分类
 svm = SVM(n_support=80, dim=2, n_classes=2, kernel="rbf", gamma=0.3, C=10.0).fit(X, Y)
 acc = (svm.predict(X) == Y).astype("float32").mean()
 ```
 
-### SignalProcessing —— STFT / MelSpec / Wavelet
+### 5. 监督学习（分类 / 回归）
+
+```python
+from PaddleScienceKits.ClassicalML import LDA, GaussianNB, MultinomialNB, SoftDecisionTree
+
+# LDA: 闭式特征分解；投影 + 可微高斯判别 log p(y|x)
+lda = LDA(n_components=2, dim=2, n_classes=3).fit(X, Y)
+logits = lda(X)                                # [N, 3]
+
+# Naive Bayes
+gnb = GaussianNB(dim=2, n_classes=2).fit(X, Y)
+mnb = MultinomialNB(n_features=6, n_classes=2, alpha=1.0).fit(counts, Y)
+
+# SoftDecisionTree
+tree = SoftDecisionTree(depth=4, n_features=2, n_classes=2, temperature=1.5)
+# train with Adam like any paddle layer
+```
+
+### 6. 聚类
+
+```python
+from PaddleScienceKits.ClassicalML import KMeans, KNN
+
+# KMeans: 软分配路径可微
+km = KMeans(k=4, dim=3, temperature=0.5)
+km.fit_kmeanspp(X)
+km.fit(X, n_iter=10)
+soft = km(X_test)                              # [N, k]
+hard = km(X_test, hard=True)                   # [N]
+
+# KNN: 记忆层
+nn = KNN(k=3, dim=4)
+nn.update_memory(paddle.randn([50, 4]))
+idx = nn(X_test, mode="indices")                # [N, 3]
+avg = nn(X_test, mode="average")                # [N, dim]
+```
+
+### 7. 稀疏表示
+
+```python
+from PaddleScienceKits.ClassicalML import SparseCoding
+
+sc = SparseCoding(n_atoms=20, n_features=16, lmbda=0.05,
+                  encoder="fista", n_iter=200)
+sc.fit(X, n_outer=200, lr=5e-2)                # 训练字典
+z, x_hat = sc(X)                              # 编码 + 重建
+```
+
+### 8. 信号处理
 
 ```python
 import paddle
 from PaddleScienceKits.SignalProcessing import STFT, ISTFT, MelSpectrogram, WaveletFilterBank
 
-# STFT / iSTFT：分析窗默认 Hann，可学习。
+# STFT / iSTFT：分析窗默认 Hann，可学习
 stft = STFT(win_length=400, hop_length=160, n_fft=512)
 istft = ISTFT(win_length=400, hop_length=160, n_fft=512, center=True)
 spec = stft(x)                                  # [B, F, T]   complex
@@ -155,101 +257,9 @@ mel = MelSpectrogram(n_mels=40, sample_rate=16000,
                      win_length=400, hop_length=160, n_fft=512)
 features = mel(x)                               # [B, 40, T]
 
-# Wavelet filter bank: 多尺度分解；Haar (filter_length=2) 或可学。
+# Wavelet filter bank
 wfb = WaveletFilterBank(n_scales=3, filter_length=2, learnable=True)
 details = wfb(x)                                # list of 3 tensors
-```
-
-### ClassicalML —— GaussianProcess / GaussianHMM
-
-```python
-import paddle
-from PaddleScienceKits.ClassicalML import GaussianProcess, GaussianHMM
-
-# GP regression: 可学超参数 + 不同核（RBF / Matérn-3/2 / Matérn-5/2 / linear / poly）。
-gp = GaussianProcess(dim=1, n_train=N, kernel="rbf").fit(X, y)
-mean, std = gp.forward_with_std(X_test)         # 预测均值 + 不确定性
-loss = gp.neg_log_marginal_likelihood()         # 用作 hyperparameter 调优目标
-
-# HMM: 离散观测 + 闭式 Baum-Welch EM；可微的 per-timestep responsibilities。
-hmm = GaussianHMM(n_states=3, n_emissions=10)
-hmm.fit_em(seq, n_iter=80)                      # seq: [T] int64
-gamma = hmm(seq)                                # [T, n_states]   软分配
-path  = hmm.viterbi(seq)                        # [T] int64       最可能路径
-```
-
-### ClassicalML —— KalmanFilter / LinearChainCRF / tSNE
-
-```python
-import paddle
-from PaddleScienceKits.ClassicalML import KalmanFilter, LinearChainCRF, tSNE
-
-# Kalman filter / smoother + (best-effort) closed-form EM.
-kf = KalmanFilter(state_dim=2, obs_dim=2)
-x_smooth = kf(y_seq)                            # [T, state_dim]   smoother 输出
-
-# Linear-chain CRF: emission + transition scores, forward-backward NLL.
-crf = LinearChainCRF(n_features=5, n_tags=3)
-loss = crf.nll(features, tags)                  # 不同iable
-gamma = crf(features)                            # [T, n_tags]   边际后验
-path  = crf.decode(features)                     # [T]          Viterbi
-
-# t-SNE: Adam-based KL minimisation with early exaggeration.
-tsne = tSNE(n_components=2, perplexity=30.0, n_iter=500)
-Y = tsne.fit_transform(X)                        # [N, 2]        嵌入
-```
-
-### ClassicalML —— SparseCoding / BayesianLinearVI
-
-```python
-import paddle
-from PaddleScienceKits.ClassicalML import SparseCoding, BayesianLinearVI
-
-# SparseCoding: ISTA / FISTA encoder + learnable dictionary.
-sc = SparseCoding(n_atoms=20, n_features=16, lmbda=0.05,
-                  encoder="fista", n_iter=200)
-sc.fit(X, n_outer=200, lr=5e-2)                # 训练字典
-z, x_hat = sc(X)                              # 编码 + 重建
-
-# Bayesian linear regression with mean-field VI.
-blr = BayesianLinearVI(n_features=3, n_outputs=1, prior_std=1.0, noise_std=0.1)
-loss = blr.neg_elbo(x, y, n_samples=1)         # -ELBO
-mean, std = blr.predict(x_test, n_samples=80)  # 后验预测均值 + 不确定性
-```
-
-### ClassicalML —— tICA / NMF
-
-```python
-import paddle
-from PaddleScienceKits.ClassicalML import tICA, NMF
-
-# tICA: 闭式广义特征分解，取最慢弛豫模式。
-tica = tICA(n_components=3, dim=D, lag=20).fit(X)   # X: [T, D]
-slow = tica.transform(X)                             # [T, n_components]
-
-# NMF: Lee-Seung 乘法更新；非负字典 W + 非负激活 H。
-nmf = NMF(n_components=10, n_features=D, init="nndsvd")
-nmf.fit(X, n_iter=200)                               # X ≥ 0
-H_new = nmf.transform(X)                             # 编码新数据
-rec   = nmf.reconstruct(H_new)                       # 重建
-```
-
-### ClassicalML —— GMMHMM / ProbabilisticPCAMixture
-
-```python
-import paddle
-from PaddleScienceKits.ClassicalML import GMMHMM, ProbabilisticPCAMixture
-
-# GMM-HMM: 每个 state 一个高斯混合；Baum-Welch EM。
-hmm = GMMHMM(n_states=3, n_components=1, n_features=D)
-hmm.fit_em(x_seq, n_iter=50)                        # x_seq: [T, D] 连续观测
-gamma = hmm(x_seq)                                  # [T, n_states]
-path  = hmm.viterbi(x_seq)                          # [T]
-
-# Mixture of probabilistic PCA (Tipping & Bishop 1999)。
-ppca = ProbabilisticPCAMixture(n_components=K, n_features=D, n_latent=L)
-ppca.fit_em(X, n_iter=30)                           # 闭式 EM
-gamma = ppca(X)                                     # [N, K]
 ```
 
 ## 设计理念
@@ -275,6 +285,7 @@ gamma = ppca(X)                                     # [N, K]
 * `examples/sparse_coding_and_vi_demo.py` —— SparseCoding 字典学习 + BayesianLinearVI 噪声回归
 * `examples/tica_and_nmf_demo.py` —— tICA 慢模投影 + NMF 3-主题分解
 * `examples/gmmhmm_and_ppca_demo.py` —— GMMHMM 3-state 恢复 + PPCA 混合 4-聚类
+* `examples/sparse_gp_spectral_mrf_demo.py` —— SparseGP 变分推断 + SpectralClustering 谱聚类 + RBM CD-k + IsingModel 相变
 
 ## 旧项目说明
 

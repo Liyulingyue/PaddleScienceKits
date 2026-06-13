@@ -20,7 +20,10 @@ import paddle
 
 
 class SoftDecisionTree(paddle.nn.Layer):
-    """Differentiable decision tree.
+    """
+    Analogue:
+        Frosst & Hinton 2017 'Distilling a Neural Network Into a Soft Decision Tree'
+    Differentiable decision tree.
 
     Parameters
     ----------

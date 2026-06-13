@@ -42,7 +42,10 @@ def _poly(x: paddle.Tensor, y: paddle.Tensor, gamma: float, c: float, d: int) ->
 
 
 class KernelRidge(paddle.nn.Layer):
-    """Dual-form kernel ridge regression.
+    """
+    Analogue:
+        sklearn.kernel_ridge.KernelRidge (Saunders et al. 1998)
+    Dual-form kernel ridge regression.
 
     Parameters
     ----------

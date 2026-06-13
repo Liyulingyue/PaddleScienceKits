@@ -31,7 +31,10 @@ def _orthonormalise(matrix: paddle.Tensor) -> paddle.Tensor:
 
 
 class tICA(paddle.nn.Layer):
-    """Time-lagged ICA / slow-modes projection.
+    """
+    Analogue:
+        Schwantes & Pande 2015 'Modeling molecular kinetics with tICA and the variational approach' (Molgedey & Schuster 1994)
+    Time-lagged ICA / slow-modes projection.
 
     Parameters
     ----------

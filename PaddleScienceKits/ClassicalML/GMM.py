@@ -68,7 +68,10 @@ def _log_gaussian_full(
 
 
 class GMM(paddle.nn.Layer):
-    """Gaussian Mixture with learnable parameters and EM fitting.
+    """
+    Analogue:
+        sklearn.mixture.GaussianMixture (Dempster et al. 1977 EM)
+    Gaussian Mixture with learnable parameters and EM fitting.
 
     Parameters
     ----------

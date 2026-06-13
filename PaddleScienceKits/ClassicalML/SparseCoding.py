@@ -25,7 +25,10 @@ def _soft_threshold(x: paddle.Tensor, t: paddle.Tensor) -> paddle.Tensor:
 
 
 class SparseCoding(paddle.nn.Layer):
-    """Sparse coding with ISTA / FISTA encoder.
+    """
+    Analogue:
+        sklearn.decomposition.DictionaryLearning (Olshausen & Field 1996; Lee & Seung 2001 ISTA/FISTA)
+    Sparse coding with ISTA / FISTA encoder.
 
     Parameters
     ----------

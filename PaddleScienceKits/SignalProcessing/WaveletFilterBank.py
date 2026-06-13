@@ -22,7 +22,10 @@ def _qmf(h: paddle.Tensor) -> paddle.Tensor:
 
 
 class WaveletFilterBank(paddle.nn.Layer):
-    """Multi-scale wavelet decomposition.
+    """
+    Analogue:
+        pywt / Mallat 1989 'A Theory for Multiresolution Signal Decomposition'
+    Multi-scale wavelet decomposition.
 
     Parameters
     ----------

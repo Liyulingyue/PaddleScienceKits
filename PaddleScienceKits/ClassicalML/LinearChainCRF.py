@@ -20,7 +20,10 @@ def _logsumexp(x: paddle.Tensor, axis: int = -1) -> paddle.Tensor:
 
 
 class LinearChainCRF(paddle.nn.Layer):
-    """Linear-chain CRF.
+    """
+    Analogue:
+        sklearn-crfsuite CRF / Lafferty, McCallum, Pereira 2001
+    Linear-chain CRF.
 
     Parameters
     ----------

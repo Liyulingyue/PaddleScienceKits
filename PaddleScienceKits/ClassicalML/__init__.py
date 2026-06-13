@@ -53,6 +53,14 @@ Currently hosts:
   (continuous observations, Baum-Welch EM).
 * :class:`ProbabilisticPCAMixture` — mixture of probabilistic PCA
   with closed-form EM per cluster (Tipping & Bishop 1999).
+* :class:`SparseGP`            — variational sparse Gaussian Process
+  with Titsias 2009 ELBO and learnable inducing points.
+* :class:`SpectralClustering`  — Ng-Jordan-Weiss spectral clustering
+  with RBF affinity and symmetric normalised graph Laplacian.
+* :class:`RBM`                 — Bernoulli Restricted Boltzmann Machine
+  with CD-k training and free-energy evaluation.
+* :class:`IsingModel`          — 2-D Ising model with single-spin
+  Gibbs sampling under periodic boundary conditions.
 """
 
 from .KMeans import KMeans
@@ -77,6 +85,10 @@ from .tICA import tICA
 from .NMF import NMF
 from .GMMHMM import GMMHMM
 from .ProbabilisticPCAMixture import ProbabilisticPCAMixture
+from .SparseGP import SparseGP
+from .SpectralClustering import SpectralClustering
+from .RBM import RBM
+from .IsingModel import IsingModel
 
 __all__ = [
     "KMeans", "KNN", "PCA", "KernelRidge", "GMM",
@@ -84,5 +96,6 @@ __all__ = [
     "BayesianRidge", "SVM", "GaussianProcess", "GaussianHMM",
     "KalmanFilter", "LinearChainCRF", "tSNE",
     "SparseCoding", "BayesianLinearVI", "tICA", "NMF",
-    "GMMHMM", "ProbabilisticPCAMixture",
+    "GMMHMM", "ProbabilisticPCAMixture", "SparseGP",
+    "SpectralClustering", "RBM", "IsingModel",
 ]
