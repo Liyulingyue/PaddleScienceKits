@@ -49,6 +49,10 @@ Currently hosts:
   eigen solve.
 * :class:`NMF`               — Non-negative matrix factorisation
   with Lee-Seung multiplicative updates and NNDSVD init.
+* :class:`GMMHMM`            — Gaussian-Mixture-emission HMM
+  (continuous observations, Baum-Welch EM).
+* :class:`ProbabilisticPCAMixture` — mixture of probabilistic PCA
+  with closed-form EM per cluster (Tipping & Bishop 1999).
 """
 
 from .KMeans import KMeans
@@ -71,6 +75,8 @@ from .SparseCoding import SparseCoding
 from .BayesianLinearVI import BayesianLinearVI
 from .tICA import tICA
 from .NMF import NMF
+from .GMMHMM import GMMHMM
+from .ProbabilisticPCAMixture import ProbabilisticPCAMixture
 
 __all__ = [
     "KMeans", "KNN", "PCA", "KernelRidge", "GMM",
@@ -78,4 +84,5 @@ __all__ = [
     "BayesianRidge", "SVM", "GaussianProcess", "GaussianHMM",
     "KalmanFilter", "LinearChainCRF", "tSNE",
     "SparseCoding", "BayesianLinearVI", "tICA", "NMF",
+    "GMMHMM", "ProbabilisticPCAMixture",
 ]

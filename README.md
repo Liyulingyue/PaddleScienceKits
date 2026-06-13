@@ -15,7 +15,7 @@ neural networks.
 | Submodule | Status | Contents |
 | --- | --- | --- |
 | `PaddleScienceKits.TimeSeries` | ✅ | `AR`, `ARMA`, `FIR`, 通用 `Autoregressive` |
-| `PaddleScienceKits.ClassicalML` | ✅ | `KMeans`, `KNN`, `PCA`, `KernelRidge`, `GMM`, `LDA`, `GaussianNB`, `MultinomialNB`, `ICA`, `SoftDecisionTree`, `BayesianRidge`, `SVM`, `GaussianProcess`, `GaussianHMM`, `KalmanFilter`, `LinearChainCRF`, `tSNE`, `SparseCoding`, `BayesianLinearVI`, `tICA`, `NMF` |
+| `PaddleScienceKits.ClassicalML` | ✅ | `KMeans`, `KNN`, `PCA`, `KernelRidge`, `GMM`, `LDA`, `GaussianNB`, `MultinomialNB`, `ICA`, `SoftDecisionTree`, `BayesianRidge`, `SVM`, `GaussianProcess`, `GaussianHMM`, `KalmanFilter`, `LinearChainCRF`, `tSNE`, `SparseCoding`, `BayesianLinearVI`, `tICA`, `NMF`, `GMMHMM`, `ProbabilisticPCAMixture` |
 | `PaddleScienceKits.SignalProcessing` | ✅ | `STFT`/`ISTFT` (可学窗), `MelSpectrogram`, `WaveletFilterBank` |
 
 ## 安装
@@ -234,6 +234,24 @@ H_new = nmf.transform(X)                             # 编码新数据
 rec   = nmf.reconstruct(H_new)                       # 重建
 ```
 
+### ClassicalML —— GMMHMM / ProbabilisticPCAMixture
+
+```python
+import paddle
+from PaddleScienceKits.ClassicalML import GMMHMM, ProbabilisticPCAMixture
+
+# GMM-HMM: 每个 state 一个高斯混合；Baum-Welch EM。
+hmm = GMMHMM(n_states=3, n_components=1, n_features=D)
+hmm.fit_em(x_seq, n_iter=50)                        # x_seq: [T, D] 连续观测
+gamma = hmm(x_seq)                                  # [T, n_states]
+path  = hmm.viterbi(x_seq)                          # [T]
+
+# Mixture of probabilistic PCA (Tipping & Bishop 1999)。
+ppca = ProbabilisticPCAMixture(n_components=K, n_features=D, n_latent=L)
+ppca.fit_em(X, n_iter=30)                           # 闭式 EM
+gamma = ppca(X)                                     # [N, K]
+```
+
 ## 设计理念
 
 * **可微**：`KMeans` 在训练模式下输出软分配（带 temperature 的 softmax），
@@ -256,6 +274,7 @@ rec   = nmf.reconstruct(H_new)                       # 重建
 * `examples/lds_crf_tsne_demo.py` —— Kalman 2D 跟踪 + CRF 玩具标注 + tSNE 5D→2D
 * `examples/sparse_coding_and_vi_demo.py` —— SparseCoding 字典学习 + BayesianLinearVI 噪声回归
 * `examples/tica_and_nmf_demo.py` —— tICA 慢模投影 + NMF 3-主题分解
+* `examples/gmmhmm_and_ppca_demo.py` —— GMMHMM 3-state 恢复 + PPCA 混合 4-聚类
 
 ## 旧项目说明
 
