@@ -15,7 +15,7 @@ neural networks.
 | Submodule | Status | Contents |
 | --- | --- | --- |
 | `PaddleScienceKits.TimeSeries` | ✅ | `AR`, `ARMA`, `FIR`, 通用 `Autoregressive` |
-| `PaddleScienceKits.ClassicalML` | ✅ | `KMeans`, `KNN`, `PCA`, `KernelRidge`, `GMM`, `LDA`, `GaussianNB`, `MultinomialNB`, `ICA`, `SoftDecisionTree`, `BayesianRidge`, `SVM` |
+| `PaddleScienceKits.ClassicalML` | ✅ | `KMeans`, `KNN`, `PCA`, `KernelRidge`, `GMM`, `LDA`, `GaussianNB`, `MultinomialNB`, `ICA`, `SoftDecisionTree`, `BayesianRidge`, `SVM`, `GaussianProcess`, `GaussianHMM` |
 | `PaddleScienceKits.SignalProcessing` | ✅ | `STFT`/`ISTFT` (可学窗), `MelSpectrogram`, `WaveletFilterBank` |
 
 ## 安装
@@ -160,6 +160,24 @@ wfb = WaveletFilterBank(n_scales=3, filter_length=2, learnable=True)
 details = wfb(x)                                # list of 3 tensors
 ```
 
+### ClassicalML —— GaussianProcess / GaussianHMM
+
+```python
+import paddle
+from PaddleScienceKits.ClassicalML import GaussianProcess, GaussianHMM
+
+# GP regression: 可学超参数 + 不同核（RBF / Matérn-3/2 / Matérn-5/2 / linear / poly）。
+gp = GaussianProcess(dim=1, n_train=N, kernel="rbf").fit(X, y)
+mean, std = gp.forward_with_std(X_test)         # 预测均值 + 不确定性
+loss = gp.neg_log_marginal_likelihood()         # 用作 hyperparameter 调优目标
+
+# HMM: 离散观测 + 闭式 Baum-Welch EM；可微的 per-timestep responsibilities。
+hmm = GaussianHMM(n_states=3, n_emissions=10)
+hmm.fit_em(seq, n_iter=80)                      # seq: [T] int64
+gamma = hmm(seq)                                # [T, n_states]   软分配
+path  = hmm.viterbi(seq)                        # [T] int64       最可能路径
+```
+
 ## 设计理念
 
 * **可微**：`KMeans` 在训练模式下输出软分配（带 temperature 的 softmax），
@@ -178,6 +196,7 @@ details = wfb(x)                                # list of 3 tensors
 * `examples/classicalml_gmm_classifier.py` —— GMM 软责任 + 线性分类器联合训练
 * `examples/classicalml_soft_tree_moons.py` —— 软决策树在 moons 数据集上训练
 * `examples/signalproc_mel_classifier.py` —— log-Mel + 线性头区分纯音频率
+* `examples/gp_and_hmm_demo.py` —— GP 回归调优超参数 + 3 状态 HMM 路径恢复
 
 ## 旧项目说明
 

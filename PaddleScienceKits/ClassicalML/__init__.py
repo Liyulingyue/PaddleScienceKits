@@ -28,6 +28,11 @@ Currently hosts:
   marginal-likelihood maximisation; full predictive distribution.
 * :class:`SVM`               — LS-SVM with kernelised RBF / linear /
   polynomial kernels and one-vs-rest multi-class extension.
+* :class:`GaussianProcess`   — GP regression with RBF / Matérn-3/2 /
+  Matérn-5/2 / linear / polynomial kernels and learnable
+  hyperparameters.
+* :class:`GaussianHMM`       — categorical-emission hidden Markov
+  model with closed-form EM (Baum-Welch).
 """
 
 from .KMeans import KMeans
@@ -41,9 +46,11 @@ from .ICA import ICA
 from .SoftDecisionTree import SoftDecisionTree
 from .BayesianRidge import BayesianRidge
 from .SVM import SVM
+from .GaussianProcess import GaussianProcess
+from .GaussianHMM import GaussianHMM
 
 __all__ = [
     "KMeans", "KNN", "PCA", "KernelRidge", "GMM",
     "LDA", "GaussianNB", "MultinomialNB", "ICA", "SoftDecisionTree",
-    "BayesianRidge", "SVM",
+    "BayesianRidge", "SVM", "GaussianProcess", "GaussianHMM",
 ]
