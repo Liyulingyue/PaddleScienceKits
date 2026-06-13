@@ -44,6 +44,11 @@ Currently hosts:
 * :class:`BayesianLinearVI` — Bayesian linear regression with
   mean-field variational inference over the weights, reparameterised
   samples, and an analytical KL term.
+* :class:`tICA`              — Time-lagged Independent Component
+  Analysis (slow-modes projection) with closed-form generalised
+  eigen solve.
+* :class:`NMF`               — Non-negative matrix factorisation
+  with Lee-Seung multiplicative updates and NNDSVD init.
 """
 
 from .KMeans import KMeans
@@ -64,11 +69,13 @@ from .LinearChainCRF import LinearChainCRF
 from .tSNE import tSNE
 from .SparseCoding import SparseCoding
 from .BayesianLinearVI import BayesianLinearVI
+from .tICA import tICA
+from .NMF import NMF
 
 __all__ = [
     "KMeans", "KNN", "PCA", "KernelRidge", "GMM",
     "LDA", "GaussianNB", "MultinomialNB", "ICA", "SoftDecisionTree",
     "BayesianRidge", "SVM", "GaussianProcess", "GaussianHMM",
     "KalmanFilter", "LinearChainCRF", "tSNE",
-    "SparseCoding", "BayesianLinearVI",
+    "SparseCoding", "BayesianLinearVI", "tICA", "NMF",
 ]
