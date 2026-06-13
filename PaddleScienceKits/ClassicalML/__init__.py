@@ -39,6 +39,11 @@ Currently hosts:
   forward-backward training and Viterbi decode.
 * :class:`tSNE`              — Student-t SNE embedding with
   early-exaggeration and Adam-based KL minimisation.
+* :class:`SparseCoding`     — dictionary learning with a learnable
+  ``[n_atoms, n_features]`` matrix and ISTA / FISTA encoder.
+* :class:`BayesianLinearVI` — Bayesian linear regression with
+  mean-field variational inference over the weights, reparameterised
+  samples, and an analytical KL term.
 """
 
 from .KMeans import KMeans
@@ -57,10 +62,13 @@ from .GaussianHMM import GaussianHMM
 from .KalmanFilter import KalmanFilter
 from .LinearChainCRF import LinearChainCRF
 from .tSNE import tSNE
+from .SparseCoding import SparseCoding
+from .BayesianLinearVI import BayesianLinearVI
 
 __all__ = [
     "KMeans", "KNN", "PCA", "KernelRidge", "GMM",
     "LDA", "GaussianNB", "MultinomialNB", "ICA", "SoftDecisionTree",
     "BayesianRidge", "SVM", "GaussianProcess", "GaussianHMM",
     "KalmanFilter", "LinearChainCRF", "tSNE",
+    "SparseCoding", "BayesianLinearVI",
 ]

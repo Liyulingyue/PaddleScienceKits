@@ -15,7 +15,7 @@ neural networks.
 | Submodule | Status | Contents |
 | --- | --- | --- |
 | `PaddleScienceKits.TimeSeries` | ✅ | `AR`, `ARMA`, `FIR`, 通用 `Autoregressive` |
-| `PaddleScienceKits.ClassicalML` | ✅ | `KMeans`, `KNN`, `PCA`, `KernelRidge`, `GMM`, `LDA`, `GaussianNB`, `MultinomialNB`, `ICA`, `SoftDecisionTree`, `BayesianRidge`, `SVM`, `GaussianProcess`, `GaussianHMM`, `KalmanFilter`, `LinearChainCRF`, `tSNE` |
+| `PaddleScienceKits.ClassicalML` | ✅ | `KMeans`, `KNN`, `PCA`, `KernelRidge`, `GMM`, `LDA`, `GaussianNB`, `MultinomialNB`, `ICA`, `SoftDecisionTree`, `BayesianRidge`, `SVM`, `GaussianProcess`, `GaussianHMM`, `KalmanFilter`, `LinearChainCRF`, `tSNE`, `SparseCoding`, `BayesianLinearVI` |
 | `PaddleScienceKits.SignalProcessing` | ✅ | `STFT`/`ISTFT` (可学窗), `MelSpectrogram`, `WaveletFilterBank` |
 
 ## 安装
@@ -199,6 +199,24 @@ tsne = tSNE(n_components=2, perplexity=30.0, n_iter=500)
 Y = tsne.fit_transform(X)                        # [N, 2]        嵌入
 ```
 
+### ClassicalML —— SparseCoding / BayesianLinearVI
+
+```python
+import paddle
+from PaddleScienceKits.ClassicalML import SparseCoding, BayesianLinearVI
+
+# SparseCoding: ISTA / FISTA encoder + learnable dictionary.
+sc = SparseCoding(n_atoms=20, n_features=16, lmbda=0.05,
+                  encoder="fista", n_iter=200)
+sc.fit(X, n_outer=200, lr=5e-2)                # 训练字典
+z, x_hat = sc(X)                              # 编码 + 重建
+
+# Bayesian linear regression with mean-field VI.
+blr = BayesianLinearVI(n_features=3, n_outputs=1, prior_std=1.0, noise_std=0.1)
+loss = blr.neg_elbo(x, y, n_samples=1)         # -ELBO
+mean, std = blr.predict(x_test, n_samples=80)  # 后验预测均值 + 不确定性
+```
+
 ## 设计理念
 
 * **可微**：`KMeans` 在训练模式下输出软分配（带 temperature 的 softmax），
@@ -219,6 +237,7 @@ Y = tsne.fit_transform(X)                        # [N, 2]        嵌入
 * `examples/signalproc_mel_classifier.py` —— log-Mel + 线性头区分纯音频率
 * `examples/gp_and_hmm_demo.py` —— GP 回归调优超参数 + 3 状态 HMM 路径恢复
 * `examples/lds_crf_tsne_demo.py` —— Kalman 2D 跟踪 + CRF 玩具标注 + tSNE 5D→2D
+* `examples/sparse_coding_and_vi_demo.py` —— SparseCoding 字典学习 + BayesianLinearVI 噪声回归
 
 ## 旧项目说明
 
